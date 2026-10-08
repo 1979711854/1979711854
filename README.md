@@ -17,11 +17,11 @@
 ## 📊 GitHub 数据 / GitHub Stats
 
 <div align="center">    
-  <img width="98%" src="https://github-profile-summary-cards.vercel.app/api/cards/profile-details?username=1979711854&theme=tokyonight" alt="Profile Details" />    
+  <img width="98%" src="https://raw.githubusercontent.com/1979711854/1979711854/profile-cards/profile-summary-card-output/profile-details.svg" alt="Profile Details" />    
 </div>
 
 <div align="center">    
-  <img width="49%" src="https://github-profile-summary-cards.vercel.app/api/cards/stats?username=1979711854&theme=tokyonight" alt="Stats" />&nbsp;<img width="49%" src="https://github-profile-summary-cards.vercel.app/api/cards/repos-per-language?username=1979711854&theme=tokyonight" alt="Top Languages" />    
+  <img width="49%" src="https://raw.githubusercontent.com/1979711854/1979711854/profile-cards/profile-summary-card-output/stats.svg" alt="Stats" />&nbsp;<img width="49%" src="https://raw.githubusercontent.com/1979711854/1979711854/profile-cards/profile-summary-card-output/repos-per-language.svg" alt="Top Languages" />    
 </div>
 
 ---
