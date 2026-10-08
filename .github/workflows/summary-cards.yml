@@ -17,8 +17,8 @@ jobs:
       - name: Generate summary cards (includes private repos via PAT)
         uses: vn7n24fzkq/github-profile-summary-cards@release
         env:
-          # 必须是一个具备私有仓库读取权限的 PAT（见下方说明）；缺失时本步骤会失败
-          GITHUB_TOKEN: ${{ secrets.SUMMARY_GITHUB_TOKEN }}
+          # 优先用具备私有仓库读取权限的 PAT；未配置时退回自动注入的 GITHUB_TOKEN（仅公开数据）
+          GITHUB_TOKEN: ${{ secrets.SUMMARY_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
         with:
           USERNAME: 1979711854
           BRANCH_NAME: profile-cards   # 卡片提交到此独立分支，避免推回 main 触发死循环
