@@ -2,7 +2,11 @@ name: GitHub Profile Summary Cards
 
 on:
   schedule:
-    - cron: "0 1 * * *"
+    # 北京时间 00:23（UTC 16:23），理由同 snake.yml：
+    # 原来的 0 1 * * * 是北京时间 09:00，再叠加 GitHub 的排队延迟，
+    # 结果一直是下午才跑完 —— 早上八点看到的永远是前一天的快照。
+    # 避开整点可以减少被延迟的概率。
+    - cron: "23 16 * * *"
   workflow_dispatch:
   push:
     branches: [main]
@@ -36,11 +40,20 @@ jobs:
           DST="profile-summary-card-output"
           # 暂存生成的卡片，避免后续切换分支时丢失
           cp -r "$SRC" /tmp/cards
-          # 用一个独立的 orphan 分支承载卡片，避免污染 main 历史
-          git branch -D profile-cards 2>/dev/null || true
-          git checkout --orphan profile-cards
-          git rm -rf --ignore-unmatched . >/dev/null 2>&1 || true
-          git clean -fdx >/dev/null 2>&1 || true
+
+          # 以远端 profile-cards 为基础（没有就新建 orphan 分支）。
+          # 原实现每次都从 main 现造一个 orphan 分支，而 `git rm -rf --ignore-unmatched .`
+          # 对已暂存的 main 文件不生效，导致 README.md / .github 被一起提进卡片分支，
+          # 而且每次都产生一个内容完全相同的提交。
+          if git fetch --depth=1 origin profile-cards 2>/dev/null; then
+            git checkout -B profile-cards FETCH_HEAD
+          else
+            git checkout --orphan profile-cards
+          fi
+          # 清空索引与工作区，只保留 .git，确保分支上只剩卡片
+          git rm -rf --cached . >/dev/null 2>&1 || true
+          find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+
           mkdir -p "$DST"
           cp /tmp/cards/0-profile-details.svg    "$DST/profile-details.svg"
           cp /tmp/cards/1-repos-per-language.svg "$DST/repos-per-language.svg"
@@ -48,7 +61,9 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add -A
-          if git diff --cached --quiet; then
+          # orphan 分支首次运行时还没有 HEAD，git diff 会直接报错，
+          # 所以先确认 HEAD 存在再判断有没有变化。
+          if git rev-parse --verify HEAD >/dev/null 2>&1 && git diff --cached --quiet; then
             echo "No changes; skip commit."
           else
             git commit -m "Update summary cards (auto)"
