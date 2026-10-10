@@ -2,7 +2,11 @@ name: Generate snake animation
 
 on:
   schedule:
-    - cron: "0 0 * * *"
+    # 北京时间 00:47（UTC 16:47）。紧接 UTC 日期翻转之后触发，
+    # 所以早上看到的蛇是"昨天已经走完"的完整数据。
+    # 刻意避开整点：GitHub 的 cron 在整点最拥堵，实测会延迟 3~6 小时，
+    # 之前的 0 0 * * *（北京时间 08:00）实际经常 11 点后才跑。
+    - cron: "47 16 * * *"
   workflow_dispatch:
   push:
     branches:
